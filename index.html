@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Message for Meku ☁️</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+<style>
+  :root {
+    --primary: #FF9BB0; /* Soft Pink */
+    --secondary: #A0C4FF; /* Soft Blue */
+    --cloud: #FFFFFF;
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #FFD1DC, #C5E1FF);
+    font-family: 'Nunito', sans-serif;
+  }
+
+  /* Background elements */
+  .sky-objects { position: absolute; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  .mini-cloud { position: absolute; background: rgba(255,255,255,0.6); border-radius: 50px; animation: float linear infinite; }
+
+  /* The Main Container */
+  .container {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+  }
+
+  /* --- STAGE 1: THE FLOATING CLOUD --- */
+  .cloud-wrapper {
+    cursor: pointer;
+    animation: float-hero 3s ease-in-out infinite alternate;
+    transition: transform 0.3s ease;
+  }
+  .cloud-wrapper:hover { transform: scale(1.05); }
+  .cloud-body {
+    width: 200px; height: 120px; background: var(--cloud);
+    border-radius: 100px; position: relative;
+    box-shadow: 0 15px 35px rgba(160, 196, 255, 0.3);
+    display: flex; justify-content: center; align-items: center;
+    font-size: 40px;
+  }
+  .cloud-body::before, .cloud-body::after {
+    content: ''; position: absolute; background: var(--cloud); border-radius: 50%;
+  }
+  .cloud-body::before { width: 90px; height: 90px; top: -40px; left: 25px; }
+  .cloud-body::after { width: 70px; height: 70px; top: -25px; right: 25px; }
+  .tap-hint { margin-top: 20px; color: var(--secondary); font-weight: 800; letter-spacing: 1px; animation: pulse 1.5s infinite; }
+
+  /* --- STAGE 2: THE QUESTION CARD --- */
+  .card-view {
+    display: none; /* Hidden initially */
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 40px;
+    box-shadow: 0 20px 60px rgba(255, 155, 176, 0.2);
+    border: 3px solid white;
+    width: min(90vw, 420px);
+    animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  h1 { color: var(--secondary); margin: 0 0 10px 0; font-weight: 800; font-size: 2.2rem; }
+  p { color: #888; font-size: 1.1rem; margin-bottom: 30px; font-weight: 600; }
+
+  .btn-container { position: relative; height: 120px; display: flex; justify-content: center; gap: 20px; }
+  
+  button {
+    padding: 15px 30px; border: none; border-radius: 50px;
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 800;
+    cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    transition: transform 0.1s;
+  }
+  button:active { transform: scale(0.95); }
+
+  #yesBtn { background: var(--primary); color: white; position: relative; z-index: 5; }
+  #noBtn { background: #EEE; color: #999; position: absolute; }
+
+  /* --- STAGE 3: SUCCESS --- */
+  .success-view {
+    display: none; color: var(--primary); animation: popIn 0.5s ease;
+  }
+  .success-gif { border-radius: 20px; border: 3px solid white; box-shadow: 0 10px 30px rgba(255, 155, 176, 0.3); margin-top: 20px; width: 100%; max-width: 250px;}
+
+  /* Animations */
+  @keyframes float { from { transform: translateX(-100vw); } to { transform: translateX(100vw); } }
+  @keyframes float-hero { from { transform: translateY(0); } to { transform: translateY(-20px); } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+  @keyframes popIn { from { transform: scale(0.5) translateY(100px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+</style>
+</head>
+<body>
+
+  <div class="sky-objects" id="skyBg"></div>
+
+  <div class="container">
+    
+    <div id="stage1" onclick="openCloud()">
+      <div class="cloud-wrapper">
+        <div class="cloud-body">💌</div>
+      </div>
+      <div class="tap-hint">TAP THE CLOUD FOR MEKU</div>
+    </div>
+
+    <div id="stage2" class="card-view">
+      <div style="font-size: 50px; margin-bottom: 10px;">🌸</div>
+      <h1>Meku!</h1>
+      <p>Will you be my Valentine? 🥺</p>
+      <div class="btn-container">
+        <button id="yesBtn" onclick="sayYes()">YES! 💖</button>
+        <button id="noBtn" onmouseover="dodgeNo()">No</button>
+      </div>
+    </div>
+
+    <div id="stage3" class="success-view">
+      <h1 style="color: var(--primary); font-size: 3rem;">YAY!!! 🎉</h1>
+      <p style="color: var(--secondary);">Best day ever! ❤️</p>
+      <img class="success-gif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMzhmbDVlcnk5bTJ0ZHl4NW14a3o4OHk2eHZ5eWJ1aG14Y3Z2YjB4eiZlcD12MV9zdGlja2Vcn1yZXN1bHRzJmN0PXM/Is0jV783S7860/giphy.gif" alt="Happy celebration">
+    </div>
+
+  </div>
+
+<script>
+  // 1. Setup Background Clouds
+  const sky = document.getElementById('skyBg');
+  for (let i = 0; i < 8; i++) {
+    let c = document.createElement('div');
+    c.className = 'mini-cloud';
+    c.style.width = Math.random() * 100 + 50 + 'px';
+    c.style.height = '30px';
+    c.style.top = Math.random() * 100 + '%';
+    c.style.opacity = Math.random() * 0.5 + 0.2;
+    c.style.animationDuration = Math.random() * 20 + 15 + 's';
+    sky.appendChild(c);
+  }
+
+  const stage1 = document.getElementById('stage1');
+  const stage2 = document.getElementById('stage2');
+  const stage3 = document.getElementById('stage3');
+  const noBtn = document.getElementById('noBtn');
+  const yesBtn = document.getElementById('yesBtn');
+
+  // Transition from Cloud to Question
+  function openCloud() {
+    stage1.style.display = 'none';
+    stage2.style.display = 'block';
+    // Initial placement of No button next to Yes
+    noBtn.style.left = (yesBtn.offsetLeft + yesBtn.offsetWidth + 20) + 'px';
+    noBtn.style.top = yesBtn.offsetTop + 'px';
+  }
+
+  // The "Dodge" Logic
+  let dodgeCount = 0;
+  function dodgeNo() {
+    const parentRect = noBtn.parentElement.getBoundingClientRect();
+    const btnRect = noBtn.getBoundingClientRect();
+    
+    // Calculate available space
+    const maxX = parentRect.width - btnRect.width;
+    const maxY = parentRect.height - btnRect.height;
+    
+    const newX = Math.random() * maxX;
+    const newY = Math.random() * maxY;
+
+    noBtn.style.left = newX + 'px';
+    noBtn.style.top = newY + 'px';
+
+    // Make Yes bigger every few dodges
+    dodgeCount++;
+    if(dodgeCount % 2 === 0) {
+      let currentScale = parseFloat(yesBtn.style.transform.replace('scale(', '')) || 1;
+      yesBtn.style.transform = `scale(${currentScale + 0.1})`;
+    }
+  }
+
+  // Mobile support for dodging
+  noBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    dodgeNo();
+  });
+
+  // Success Logic
+  function sayYes() {
+    stage2.style.display = 'none';
+    stage3.style.display = 'block';
+    fireConfetti();
+  }
+
+  function fireConfetti() {
+    const duration = 3000;
+    const end = Date.now() + duration;
+    const colors = ['#FF9BB0', '#A0C4FF', '#ffffff'];
+
+    (function frame() {
+      confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
+      confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+      if (Date.now() < end) requestAnimationFrame(frame);
+    }());
+  }
+</script>
+</body>
+</html>
